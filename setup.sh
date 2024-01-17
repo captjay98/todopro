@@ -58,6 +58,9 @@ cd ..
 # Start the server
 php artisan serve &
 
+# Run Tests
+php artisan test
+
 echo "Setup complete. Servers running in the background."
 
 # Kill services on script exit

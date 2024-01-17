@@ -1,4 +1,4 @@
-You can use the script[setup.sh] to do this automagically and just Press Enter when you're done to stop the servers.
+You can use the script[setup.sh] to do this automagically and just Press Enter when you're done to stop the servers/cancel the running tests.
 
 I recommend using a local DB.
 
@@ -53,3 +53,7 @@ cd ..
 ## Start the Backend Dev server
 
 php artisan serve &
+
+## RUN BACKEND TESTS
+
+php artisan test
