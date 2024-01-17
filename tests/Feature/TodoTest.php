@@ -384,12 +384,12 @@ class TodoTest extends TestCase
             'user_id' => $user->id,
             'completed' => true,
         ]);
-        Todo::factory()->actingAs($user)->count(3)->create([
+        Todo::factory()->count(3)->create([
             'user_id' => $user->id,
             'completed' => false,
         ]);
 
-        $response = $this->getJson('/api/todos?filter=all');
+        $response = $this->actingAs($user)->getJson('/api/todos?filter=all');
 
         $response->assertStatus(200);
     }
