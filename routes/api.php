@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Resources\Profile as ProfileResource;
+use App\Http\Controllers\Api\TodoController;
+use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -15,5 +19,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
+    return new ProfileResource($request->user());
+});
+
+Route::apiResource('todos', TodoController::class)->middleware(['auth:sanctum']);
+
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::put('profile', [ProfileController::class, 'update']);
+    Route::delete('profile', [ProfileController::class, 'destroy']);
 });
