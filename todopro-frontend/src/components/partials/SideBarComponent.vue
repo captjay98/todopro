@@ -6,6 +6,7 @@ import { ref } from 'vue'
 
 const route = useRoute()
 const currentFilter = ref('all')
+const isSidebarVisible = ref(true)
 
 const { getTodos, todosData, currentPage } = defineProps({
     getTodos: Function,
@@ -17,12 +18,22 @@ const setFilterAndFetchTodos = (filter) => {
     currentFilter.value = filter
     getTodos(currentPage, todosData, filter)
 }
+const toggleSidebar = () => {
+    isSidebarVisible.value = !isSidebarVisible.value
+}
 
 </script>
 
 <template>
-    <aside v-if="route.path === '/todos'"
-        class="max-sm:hidden fixed h-screen left-0 top-0 bg-blue-900/70 rounded-lg w-[10%]">
+    <div v-if="route.path === '/todos'" class="w-[3rem] text-slate-400 fixed top-10 left-32 lg:hidden top-2 left-5 z-100">
+        <Button @click="toggleSidebar">SB</Button>
+    </div>
+    <aside v-if="isSidebarVisible && route.path === '/todos'"
+        class=" fixed h-screen left-0 top-0 bg-blue-900/70 rounded-lg w-[8rem] xl:w-[10%]">
+        <div v-if="route.path === '/todos'"
+            class="w-[3rem] text-slate-400 fixed top-10 left-32 lg:hidden top-2 left-5 z-100">
+            <Button @click="toggleSidebar">SB</Button>
+        </div>
         <div class="flex flex-col gap-5 justify-center items-center pt-20 h-full text-slate-200 text-[0.9rem]">
             <div class="px-2">
                 <RouterLink to="/create-todo">
