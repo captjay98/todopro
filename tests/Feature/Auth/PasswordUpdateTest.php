@@ -17,7 +17,7 @@ class PasswordUpdateTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->put('/change-password', [
+            ->putJson('/change-password', [
                 'current_password' => 'password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
@@ -35,13 +35,48 @@ class PasswordUpdateTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->put('/change-password', [
+            ->putJson('/change-password', [
                 'current_password' => 'wrong-password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
             ]);
 
         $response
-            ->assertStatus(302);
+            ->assertStatus(422);
+        $response->assertJsonValidationErrors('current_password');
+    }
+
+    public function test_new_password_and_confirmation_must_match_to_update_password(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->putJson('/change-password', [
+                'current_password' => 'password',
+                'password' => 'new-password',
+                'password_confirmation' => 'newssword',
+            ]);
+
+        $response
+            ->assertStatus(422);
+        $response->assertJsonValidationErrors('password');
+    }
+
+    public function test_new_password_must_be_atleast_8_characters_long_to_update_password(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->putJson('/change-password', [
+                'current_password' => 'password',
+                'password' => 'new',
+                'password_confirmation' => 'new',
+            ]);
+
+        $response
+            ->assertStatus(422);
+        $response->assertJsonValidationErrors('password');
     }
 }

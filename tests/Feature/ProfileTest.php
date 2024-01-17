@@ -19,7 +19,35 @@ class ProfileTest extends TestCase
             '/api/profile',
             [
                 'email' => 'example@email.com',
-                'password' => 'password',
+                'name' => 'New Name',
+            ]
+        );
+
+        $response->assertOk();
+    }
+
+    public function test_users_can_update_just_name(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->putJson(
+            '/api/profile',
+            [
+                'name' => 'New Name',
+            ]
+        );
+
+        $response->assertOk();
+    }
+
+    public function test_users_can_update_just_email(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->putJson(
+            '/api/profile',
+            [
+                'email' => 'example@email.com',
             ]
         );
 
@@ -34,7 +62,7 @@ class ProfileTest extends TestCase
             '/api/profile',
             [
                 'email' => $user->email,
-                'password' => 'password',
+                'name' => 'New Name',
             ]
         );
         $response->assertJsonValidationErrors('email');
@@ -50,11 +78,20 @@ class ProfileTest extends TestCase
             '/api/profile',
             [
                 'email' => $user2->email,
-                'password' => 'password',
+                'name' => 'New Name',
             ]
         );
 
         $response->assertJsonValidationErrors('email');
         $response->assertStatus(422);
+    }
+
+    public function test_users_can_delete_account(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->deleteJson('/api/profile');
+
+        $response->assertOk();
     }
 }
