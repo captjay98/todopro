@@ -9,7 +9,7 @@ use app\Http\Resources\User as UserResource;
 class Todo extends JsonResource
 {
     /**
-     * Transform the resource into an array.
+     * Transform the Todo resource into an array.
      *
      * @return array<string, mixed>
      */
