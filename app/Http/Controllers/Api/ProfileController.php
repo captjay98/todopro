@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\User as UserResource;
 use App\Models\User;
 use App\Models\Todo;
 use App\Http\Requests\ProfileRequest;
@@ -12,25 +13,36 @@ class ProfileController extends Controller
 {
 
     /**
-     * Update User Profile..
+     * Update User Profile with the validated request data.
+     *
+     * @param ProfileRequest Request object containing updated user data.
+     * @return JsonResponse
      */
     public function update(ProfileRequest $request)
     {
         $id = auth()->id();
         $user = User::where('id', $id)->update($request->validated());
-        return response()->json([$data = $user, $status = 200]);
+
+        return new UserResource(User::findOrFail($id));
     }
 
     /**
-     * Delete Account and associated data.
+     * Delete Account, Todos and associated data.
+     *
+     * @param Request
+     * @return JsonResponse returns success or faulure message
      */
     public function destroy(Request $request)
     {
-        $id = auth()->id();
-        Todo::where('user_id', $id)->delete();
-        User::where('id', $id)->delete();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return response()->json(["success" => "Account Deleted"], $status = 203);
+        try {
+            $id = auth()->id();
+            Todo::where('user_id', $id)->delete();
+            User::where('id', $id)->delete();
+            auth()->guard('web')->logout();
+            return response()->json(["success" => "Account Deleted"], 200);
+        } catch (\Exception $e) {
+            dd($e);
+            return response()->json(["error" => "An error occurred while deleting the account"], 500);
+        }
     }
 }

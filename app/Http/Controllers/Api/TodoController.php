@@ -10,12 +10,19 @@ use App\Http\Requests\UpdateTodoRequest;
 use App\Models\Todo;
 use App\Http\Resources\Todo as TodoResource;
 use Illuminate\Http\Request;
-use PhpParser\Node\Stmt\TryCatch;
 
 class TodoController extends Controller
 {
 
 
+    /**
+     * Retrieves a paginated collection of todos
+     * based on the Authenticated user's ID and optional filter.
+     *
+     * @param Request The request object containing the filter parameter.
+     * @throws ValidationException If the filter parameter fails validation.
+     * @return TodoResource A collection of todos.
+     */
     public function index(Request $request)
     {
         $userId = auth()->id();
@@ -42,53 +49,72 @@ class TodoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created Todo in storage.
+     *
+     * @param CreateTodoRequest The request object containing the todo data.
+     * @return TodoResource The Todo Resource.
      */
     public function store(CreateTodoRequest $request)
     {
-        $id = auth()->id();
-        $todo = Todo::create(
-            [
-                'user_id' => $id,
-                'title' => $request->title,
-                'description' => $request->description,
-                'completed' => $request->completed
-            ]
-        );
-        return response()->json(['todo' => $todo], 201);
+        $userId = auth()->id();
+
+        $todo = Todo::create([
+            'user_id' => $userId,
+            'title' => $request->title,
+            'description' => $request->description,
+            'completed' => $request->completed
+        ]);
+
+        return new TodoResource($todo);
     }
 
+
+
     /**
-     * Display the specified resource.
+     * Display the specified Todo if user is Authorized.
+     *
+     * @param  Todo  The Todo to display
+     * @return TodoResource  The Todo resource
+     * @throws  AuthorizationException  If the user is not authorized
+     * @throws  ModelNotFoundException  If the Todo is not found
      */
     public function show(Todo $todo)
     {
         if ($todo->user_id !== auth()->id()) {
-
             abort(403, 'You are not allowed to perform this action.');
         }
-        return new TodoResource(Todo::findorfail($todo->id));
+
+        return new TodoResource(Todo::findOrFail($todo->id));
     }
 
+
+
     /**
-     * Update the specified resource in storage.
+     * Update the specified Todo
+     *
+     * @param UpdateTodoRequest Request object containing updated Todo data
+     * @param  Todo The Todo to Update
+     * @return TodoResource  The Todo resource
      */
     public function update(UpdateTodoRequest $request, Todo $todo)
     {
         $validated_data = $request->validated();
-
         $todo->update($validated_data);
-        // return new TodoResource($todo);
+        return new TodoResource($todo);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
 
+
+    /**
+     * Deletes a todo if the authenticated user is Authorized.
+     *
+     * @param Todo The Todo to be deleted.
+     * @throws ModelNotFoundException If the todo is not found.
+     * @return JsonResponse The JSON response indicating the success or error message.
+     */
     public function destroy(Todo $todo)
     {
         if ($todo->user_id !== auth()->id()) {
-
             abort(403, 'You are not authorized to Perform this action.');
         }
         try {
@@ -96,7 +122,6 @@ class TodoController extends Controller
             $todo->delete();
             return response()->json(['success' => ['message' => 'Todo Deleted']], 204);
         } catch (ModelNotFoundException $e) {
-
             return response()->json(['error' => ['message' => 'Todo not found']], 404);
         }
     }
