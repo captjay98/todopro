@@ -4,40 +4,75 @@ import router from '@/router'
 export function useTodoApi() {
     const toast = useToast()
 
+    /**
+     * Fetches todos from the API based on the specified page and filter.
+     *
+     * @param {number} page - The page number to fetch todos from.
+     * @param {object} todosData - The object to store the fetched todos data.
+     * @param {string} [filter=''] - Optional The filter to apply when fetching todos.
+     */
     const getTodos = async (page, todosData, filter = '') => {
         try {
-            toast.info('Fetching Todos...', { timeout: 1000 })
+            toast.info('Fetching Todos...', { timeout: 2000 })
             const params = { page }
             if (filter) params.filter = filter
             const response = await axiosInstance.get('/api/todos', { params })
-            todosData.todos = response.data.data
-            todosData.currentPage = response.data.meta.current_page
-            todosData.totalPages = response.data.meta.last_page
-            todosData.totalItems = response.data.meta.total
+            const { data, meta: { current_page, last_page, total } } = response.data
+            Object.assign(todosData, { todos: data, currentPage: current_page, totalPages: last_page, totalItems: total })
         } catch (error) {
-            if (error && error.response && error.response.data && error.response.data.message) {
-                toast.error(error.response.data.message)
-            } else {
-                toast.error('There was a problem fetching todos')
+            if (error.response){
+                if (error.response && error.response.status === 403) {
+                    toast.error('You are not authorized to perform this action.')
+                    router.push('/todos')
+                } else if(error.response.data.message){
+                    toast.error(error.response.data.message)
+                }
+                else{
+                toast.error(`Coudn't fetch Todos. ${error.response.statusText}`)
             }
-            console.log(error)
+            }else {
+                toast.error('There was a network error. Please try again later.')
+            }
         }
     }
 
+    /**
+     * Retrieves a todo from the server and updates the form with its data.
+     *
+     * @param {object} form - the form object to update
+     * @param {number} id - the ID of the todo to retrieve
+     * @return {void}
+     */
     const getTodo = async (form, id) => {
         try {
             const response = await axiosInstance.get(`api/todos/${id}`)
             const todo = response.data.data
             form.value = todo
         } catch (error) {
-            if (error.response && error.response.status === 403) {
-                toast.error('You are not authorized to perform this action.')
-                router.push('/todos')
+            if (error.response){
+                if (error.response && error.response.status === 403) {
+                    toast.error('You are not authorized to perform this action.')
+                    router.push('/todos')
+                } else if(error.response.data.message){
+                    toast.error(error.response.data.message)
+                }
+                else{
+                toast.error(`There was an error retrieving the todo. ${error.response.statusText}`)
             }
-            toast.error('There was an error retrieving the todo')
+            }else {
+                toast.error('There was a network error. Please try again later.')
+            }
+
         }
     }
 
+    /**
+     * Updates a todo with the given form data and ID.
+     *
+     * @param {object} form - The form data containing the updated todo details.
+     * @param {number} id - The ID of the todo to be updated.
+     * @return {Promise} A promise that resolves when the todo is successfully updated.
+     */
     const updateTodo = async (form, id) => {
         console.log(form.title)
         console.log(form.id)
@@ -47,12 +82,13 @@ export function useTodoApi() {
             console.log(response)
             toast.success('Your todo has been updated!')
         } catch (error) {
-            console.error('Error updating todo:', error)
             if (error.response) {
                 if (error.response.status === 403) {
                     toast.error('You are not authorized to perform this action.')
-                } else {
-                    toast.error(`There was an error updating the todo: ${error.response.statusText}`)
+                } else if(error.response.data.message){
+                    toast.error(error.response.data.message)
+                }else {
+                    toast.error(`Failed to update Todo. ${error.response.statusText}`)
                 }
             } else {
                 toast.error('There was a network error. Please try again later.')
@@ -61,9 +97,16 @@ export function useTodoApi() {
         }
     }
 
+/**
+ * Creates a new Todo item.
+ *
+ * @param {Object} form - The form data for creating the Todo.
+ * @param {Function} emit - emits a createdTodo event.
+ * @return {Promise} A promise that resolves with the created Todo object.
+ */
     const createTodo = async (form, emit) => {
         console.log(form)
-        toast.info('Creating Todo...', { timeout: 1000 })
+        toast.info('Creating Todo...', { timeout: 2000 })
         try {
             const response = await axiosInstance.post('/api/todos', form)
             const todo = response.data.todo
@@ -71,13 +114,26 @@ export function useTodoApi() {
             toast.success('Todo Created')
             router.push('/todos')
         } catch (error) {
-            if (error && error.response.data.message) {
-                toast.error(error.response.data.message)
+            if (error.response) {
+                if(error.response.data.message){
+                    toast.error(error.response.data.message)
+                }
+               else(
+                toast.error(`Failed to Create Todo. ${error.response.statusText}`)
+               )
+            }else {
+                toast.error('There was a network error. Please try again later.')
             }
-            toast.error('Something went wrong')
         }
     }
 
+    /**
+     * Deletes a todo from the server and emits a todoDeleted event.
+     *
+     * @param {object} todo - The todo object to be deleted.
+     * @param {function} emit - emits a todoDeleted event.
+     * @return {Promise} - A promise that resolves when the todo is deleted.
+     */
     const deleteTodo = async (todo, emit) => {
         toast.info('Deleting Todo', { timeout: 1000 })
         try {
@@ -100,25 +156,39 @@ export function useTodoApi() {
                 } else if (error && error.response.data.message) {
                     toast.error(error.response.data.message)
                 } else {
-                    toast.error('There was an error Deleting the todo')
+                    toast.error(`There was an error Deleting the todo. ${error.response.statusText}`)
                 }
+            }else {
+                toast.error('There was a network error. Please try again later.')
             }
         }
     }
 
+    /**
+     * Updates the completed status of a todo item.
+     *
+     * @param {object} todo - The todo item to update.
+     * @param {boolean} completed - takes the current completed status.
+     * @return {Promise<void>} - A promise that resolves once the update is complete.
+     */
     const updateCompleted = async (todo, completed) => {
         let update = !completed
-
         toast.info('Updating Todo')
         try {
             await axiosInstance.put(`api/todos/${todo.id}`, { completed: update })
             toast.clear()
             toast.success('Todo Status Updated')
         } catch (error) {
-            if (error.response.data.message) {
-                toast.error(error.response.data.message)
+            if (error.response) {
+                if(error.response.data.message){
+                    toast.error(error.response.data.message)
+                }
+               else(
+                toast.error(`Failed to Update Todo.${error.response.statusText}`)
+               )
+            }else {
+                toast.error('There was a network error. Please try again later.')
             }
-            toast.error('Something went wrong.')
         }
     }
 

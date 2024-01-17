@@ -1,12 +1,13 @@
 <script setup>
-import Button from '@/components/partials//ButtonComponent.vue'
-import { useRouter, RouterLink } from 'vue-router'
+import Button from '@/components/partials/ButtonComponent.vue'
+import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axiosInstance from '@/middlewares/axiosInstance.js'
-import { useToast } from 'vue-toastification';
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
-const toast = useToast();
+const toast = useToast()
+
 
 const loading = ref(false)
 const message = ref('{}')
@@ -17,25 +18,48 @@ const form = ref({
     password_confirmation: ''
 })
 
+/**
+ * Registers a new user by sending form data to the /register endpoint.
+ * It handles the success and error cases by showing appropriate toast messages.
+ * On successful registration, it stores the token, sets the authorization header,
+ * and navigates to the 'home' route.
+ */
 const register = async () => {
     message.value = {}
     loading.value = true
+    toast("Signing you up...", { timeout: false })
+
     try {
+        // Obtain CSRF token
         await axiosInstance.get('sanctum/csrf-cookie')
         const response = await axiosInstance.post('register', form.value)
         localStorage.setItem('token', response.data.token)
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(
-            'token'
-        )}`
-
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`
+        toast.clear()
+        toast.success('Welcome to TodoPro!')
         router.push({ name: 'home' })
     } catch (error) {
-        message.value = error.response.data.errors
-        toast.error(error.response.data.message)
+        toast.clear()
+        if (error.response) {
+            if (error.response.status === 422) {
+                // Validation errors
+                for (const fieldErrors of Object.values(error.response.data.errors)) {
+                    fieldErrors.forEach(errorMessage => {
+                        toast.error(errorMessage)
+                    })
+                }
+            } else if (error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message)
+            }
+        } else {
+            toast.error('There was a network error. Please try again later.')
+        }
+    } finally {
+
+        loading.value = false
+        form.value.password = ''
+        form.value.password_confirmation = ''
     }
-    finally { loading.value = false }
-    form.value.password = ''
-    form.value.password_confirmation = ''
 }
 </script>
 <template>
@@ -71,7 +95,7 @@ const register = async () => {
                 </div>
 
                 <div class="mt-4 w-full">
-                    <Button :disabled='loading' class="w-full">SIGN UP </Button>
+                    <Button :disabled="loading" class="w-full disabled:bg-blue-900/50">SIGN UP </Button>
                 </div>
                 <div>
 

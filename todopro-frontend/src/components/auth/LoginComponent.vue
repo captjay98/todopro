@@ -17,6 +17,13 @@ const form = ref({
     password: ''
 })
 
+/**
+ * Attempts to log in a user using the provided email and password.
+ * It obtains a CSRF token, sends the login credentials to /login endpoint,
+ * and then handles success and error responses. On success, it stores the token,
+ * sets the authorization header, updates user state, and redirects to the 'home' route.
+ *  On error, it shows a relevant error message using toast notifications.
+ */
 const login = async () => {
     message.value = ''
     loading.value = true
@@ -31,8 +38,17 @@ const login = async () => {
         userStore.setUser()
         router.push({ name: 'home' })
     } catch (error) {
-        if (error.response.data.error) {
-            toast.error(error.response.data.error)
+        if (error.response) {
+            console.log(error.response)
+            toast.clear()
+            if (error.response.status === 422) {
+                toast.error(error.response.data.message)
+            } else if (error.response.data && error.response.data.error) {
+                toast.error(error.response.data.error);
+            }
+        }
+        else {
+            toast.error('There was a network error. Please try again later.')
         }
     } finally {
         loading.value = false
@@ -59,7 +75,7 @@ const login = async () => {
                 </div>
 
                 <div class="mt-4 w-full">
-                    <Button :disabled="loading" class="w-full disabled:bg-black">SIGN IN</Button>
+                    <Button :disabled="loading" class="w-full disabled:bg-blue-900/50">SIGN IN</Button>
                 </div>
                 <div>
                     <p class="text-sm">
