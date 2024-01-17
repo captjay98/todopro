@@ -2,7 +2,7 @@
 set -e
 
 # Clone the repository
-git clone https://github.com/captjay98/todopro
+# git clone https://github.com/captjay98/todopro
 cd todopro
 
 # Copy the example environment file
