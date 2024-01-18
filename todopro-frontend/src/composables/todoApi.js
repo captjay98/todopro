@@ -109,7 +109,8 @@ export function useTodoApi() {
         toast.info('Creating Todo...', { timeout: 2000 })
         try {
             const response = await axiosInstance.post('/api/todos', form)
-            const todo = response.data.todo
+            const todo = response.data.data
+            console.log(response)
             emit('todoCreated', todo.id)
             toast.success('Todo Created')
             router.push('/todos')
