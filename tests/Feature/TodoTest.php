@@ -8,14 +8,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-
-
-
-
-
 class TodoTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
     public function test_can_a_get_list_of_todos()
     {
@@ -24,11 +20,13 @@ class TodoTest extends TestCase
         $response = $this->actingAs($user)->getJson(route('todos.index'));
 
         $response->assertOk();
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => ['id', 'title', 'description', 'completed']
+        $response->assertJsonStructure(
+            [
+                'data' => [
+                    '*' => ['id', 'title', 'description', 'completed']
+                ]
             ]
-        ]);
+        );
         $response->assertJsonCount(3, 'data');
     }
 
@@ -41,13 +39,15 @@ class TodoTest extends TestCase
         Todo::factory()->count(10)->create();
         $response = $this->getJson(route('todos.index'));
         $response->assertOk();
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => []
-            ],
-            'links',
-            'meta',
-        ]);
+        $response->assertJsonStructure(
+            [
+                'data' => [
+                    '*' => []
+                ],
+                'links',
+                'meta',
+            ]
+        );
         $this->assertCount(6, $response->json('data'));
 
         foreach ($response->json('data') as $todo) {
@@ -66,11 +66,13 @@ class TodoTest extends TestCase
         $response = $this->actingAs($user2)->getJson(route('todos.index'));
 
         $response->assertOk();
-        $response->assertJsonStructure([
-            'data' => [
-                '*' => ['id', 'title', 'description', 'completed']
+        $response->assertJsonStructure(
+            [
+                'data' => [
+                    '*' => ['id', 'title', 'description', 'completed']
+                ]
             ]
-        ]);
+        );
         $response->assertJsonCount(3, 'data');
     }
 
@@ -79,11 +81,14 @@ class TodoTest extends TestCase
     {
         $this->withExceptionHandling();
 
-        $response = $this->postJson(route('todos.store'), [
-            'title' => 'Sample Todo',
-            'description' => 'This is a sample todo item.',
-            'completed' => false
-        ]);
+        $response = $this->postJson(
+            route('todos.store'),
+            [
+                'title' => 'Sample Todo',
+                'description' => 'This is a sample todo item.',
+                'completed' => false
+            ]
+        );
 
         $response->assertStatus(401);
         $this->assertDatabaseMissing('todos', ['title' => 'Sample Todo']);
@@ -103,13 +108,15 @@ class TodoTest extends TestCase
 
         $response->assertCreated();
 
-        $response->assertJsonFragment([
+        $response->assertJsonFragment(
+            [
 
-            'user_id' => $user->id,
-            'title' => $todoData['title'],
-            'description' => $todoData['description'],
-            'completed' => $todoData['completed'],
-        ]);
+                'user_id' => $user->id,
+                'title' => $todoData['title'],
+                'description' => $todoData['description'],
+                'completed' => $todoData['completed'],
+            ]
+        );
 
         $this->assertDatabaseHas('todos', $todoData);
     }
@@ -129,12 +136,14 @@ class TodoTest extends TestCase
 
         $response->assertStatus(422);
 
-        $response->assertJsonMissing([
+        $response->assertJsonMissing(
+            [
 
-            'user_id' => $user->id,
-            'description' => $todoData['description'],
-            'completed' => $todoData['completed'],
-        ]);
+                'user_id' => $user->id,
+                'description' => $todoData['description'],
+                'completed' => $todoData['completed'],
+            ]
+        );
 
         $this->assertDatabaseMissing('todos', $todoData);
     }
@@ -152,11 +161,13 @@ class TodoTest extends TestCase
 
         $response->assertStatus(422);
 
-        $response->assertJsonMissing([
+        $response->assertJsonMissing(
+            [
 
-            'user_id' => $user->id,
-            'completed' => $todoData['completed'],
-        ]);
+                'user_id' => $user->id,
+                'completed' => $todoData['completed'],
+            ]
+        );
         $this->assertDatabaseMissing('todos', $todoData);
     }
 
@@ -173,11 +184,13 @@ class TodoTest extends TestCase
 
         $response->assertStatus(422);
 
-        $response->assertJsonMissing([
+        $response->assertJsonMissing(
+            [
 
-            'user_id' => $user->id,
-            'description' => $todoData['description'],
-        ]);
+                'user_id' => $user->id,
+                'description' => $todoData['description'],
+            ]
+        );
         $this->assertDatabaseMissing('todos', $todoData);
     }
 
@@ -191,12 +204,14 @@ class TodoTest extends TestCase
 
 
         $response->assertOk();
-        $response->assertJsonFragment([
-            'id' => $todo->id,
-            'title' => $todo->title,
-            'description' => $todo->description,
-            'completed' => $todo->completed,
-        ]);
+        $response->assertJsonFragment(
+            [
+                'id' => $todo->id,
+                'title' => $todo->title,
+                'description' => $todo->description,
+                'completed' => $todo->completed,
+            ]
+        );
     }
 
     public function test_cannot_show_another_users_todo()
@@ -279,7 +294,7 @@ class TodoTest extends TestCase
         $user = User::factory()->create();
         $todo = Todo::factory()->create(['user_id' => $user->id]);
         $response = $this->actingAs($user)->deleteJson(route('todos.destroy', $todo->id));
-        $response->assertStatus(204);
+        $response->assertOk();
         $this->assertDatabaseMissing('todos', ['id' => $todo->id]);
     }
 
@@ -298,14 +313,18 @@ class TodoTest extends TestCase
     public function test_can_filter_todo_with_completed_true()
     {
         $user = User::factory()->create();
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => true,
-        ]);
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => false,
-        ]);
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => true,
+            ]
+        );
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => false,
+            ]
+        );
 
         $response = $this->actingAs($user)->getJson('/api/todos?filter=true');
 
@@ -316,14 +335,18 @@ class TodoTest extends TestCase
     public function test_can_filter_todo_with_completed_false()
     {
         $user = User::factory()->create();
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => true,
-        ]);
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => false,
-        ]);
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => true,
+            ]
+        );
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => false,
+            ]
+        );
 
         $response = $this->actingAs($user)->getJson('/api/todos?filter=false');
 
@@ -335,59 +358,75 @@ class TodoTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => true,
-        ]);
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => true,
+            ]
+        );
 
-        $latestTodo = Todo::factory()->create([
-            'user_id' => $user->id,
-            'completed' => false,
-        ]);
+        $latestTodo = Todo::factory()->create(
+            [
+                'user_id' => $user->id,
+                'completed' => false,
+            ]
+        );
 
         $response = $this->actingAs($user)->getJson('/api/todos?filter=newest');
 
         $response->assertStatus(200)
-            ->assertJsonFragment([
-                'id' => $latestTodo->id,
-                'completed' => false
-            ]);
+            ->assertJsonFragment(
+                [
+                    'id' => $latestTodo->id,
+                    'completed' => false
+                ]
+            );
     }
 
     public function test_can_filter_todo_with_oldest()
     {
         $user = User::factory()->create();
 
-        $firstTodo = Todo::factory()->create([
-            'user_id' => $user->id,
-            'completed' => true,
-        ]);
+        $firstTodo = Todo::factory()->create(
+            [
+                'user_id' => $user->id,
+                'completed' => true,
+            ]
+        );
 
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => false,
-        ]);
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => false,
+            ]
+        );
 
         $response = $this->actingAs($user)->getJson('/api/todos?filter=oldest');
 
         $response->assertStatus(200)
-            ->assertJsonFragment([
-                'id' => $firstTodo->id,
-                'completed' => true
-            ]);
+            ->assertJsonFragment(
+                [
+                    'id' => $firstTodo->id,
+                    'completed' => true
+                ]
+            );
     }
 
     public function test_can_filter_todo_with_all()
     {
         $user = User::factory()->create();
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => true,
-        ]);
-        Todo::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'completed' => false,
-        ]);
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => true,
+            ]
+        );
+        Todo::factory()->count(3)->create(
+            [
+                'user_id' => $user->id,
+                'completed' => false,
+            ]
+        );
 
         $response = $this->actingAs($user)->getJson('/api/todos?filter=all');
 
