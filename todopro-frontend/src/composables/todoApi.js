@@ -80,7 +80,7 @@ export function useTodoApi() {
      */
     const updateTodo = async (form, id) => {
         try {
-            const response = await axiosInstance.put(`/api/todos/${id}`, form)
+            await axiosInstance.put(`/api/todos/${id}`, form)
             toast.clear()
             toast.success('Your todo has been updated!')
             router.push('/todos')
@@ -114,7 +114,10 @@ export function useTodoApi() {
             const todo = response.data.data
             emit('todoCreated', todo.id)
             toast.success('Todo Created')
-            location.reload()
+            if (router.currentRoute.value.path === '/' ) {
+                location.reload()
+            }
+            router.push('/todos')
         } catch (error) {
             if (error.response) {
                 if (error.response.data.message) {
