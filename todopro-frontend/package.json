@@ -27,11 +27,13 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.49.0",
     "eslint-plugin-vue": "^9.17.0",
-    "jsdom": "^23.0.1",
+    "happy-dom": "^13.1.4",
+    "jsdom": "^23.2.0",
     "postcss": "^8.4.33",
     "prettier": "^3.0.3",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.10",
-    "vitest": "^1.0.4"
+    "vitest": "^1.0.4",
+    "vue-router-mock": "^1.0.0"
   }
 }
