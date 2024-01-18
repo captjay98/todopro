@@ -13,13 +13,11 @@ use Illuminate\Http\Request;
 
 class TodoController extends Controller
 {
-
-
     /**
      * Retrieves a paginated collection of todos
      * based on the Authenticated user's ID and optional filter.
      *
-     * @param Request The request object containing the filter parameter.
+     * @param  Request The request object containing the filter parameter.
      * @throws ValidationException If the filter parameter fails validation.
      * @return TodoResource A collection of todos.
      */
@@ -51,19 +49,21 @@ class TodoController extends Controller
     /**
      * Store a newly created Todo in storage.
      *
-     * @param CreateTodoRequest The request object containing the todo data.
+     * @param  CreateTodoRequest The request object containing the todo data.
      * @return TodoResource The Todo Resource.
      */
     public function store(CreateTodoRequest $request)
     {
         $userId = auth()->id();
 
-        $todo = Todo::create([
+        $todo = Todo::create(
+            [
             'user_id' => $userId,
             'title' => $request->title,
             'description' => $request->description,
             'completed' => $request->completed
-        ]);
+            ]
+        );
 
         return new TodoResource($todo);
     }
@@ -75,8 +75,8 @@ class TodoController extends Controller
      *
      * @param  Todo  The Todo to display
      * @return TodoResource  The Todo resource
-     * @throws  AuthorizationException  If the user is not authorized
-     * @throws  ModelNotFoundException  If the Todo is not found
+     * @throws AuthorizationException  If the user is not authorized
+     * @throws ModelNotFoundException  If the Todo is not found
      */
     public function show(Todo $todo)
     {
@@ -92,7 +92,7 @@ class TodoController extends Controller
     /**
      * Update the specified Todo
      *
-     * @param UpdateTodoRequest Request object containing updated Todo data
+     * @param  UpdateTodoRequest Request object containing updated Todo data
      * @param  Todo The Todo to Update
      * @return TodoResource  The Todo resource
      */
@@ -108,7 +108,7 @@ class TodoController extends Controller
     /**
      * Deletes a todo if the authenticated user is Authorized.
      *
-     * @param Todo The Todo to be deleted.
+     * @param  Todo The Todo to be deleted.
      * @throws ModelNotFoundException If the todo is not found.
      * @return JsonResponse The JSON response indicating the success or error message.
      */
@@ -120,9 +120,9 @@ class TodoController extends Controller
         try {
             $todo = Todo::findOrFail($todo->id);
             $todo->delete();
-            return response()->json(['success' => ['message' => 'Todo Deleted']], 204);
+            return response()->json(['message' => 'Todo Deleted'], 200);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => ['message' => 'Todo not found']], 404);
+            return response()->json(['error'  => 'Todo not found'], 404);
         }
     }
 }

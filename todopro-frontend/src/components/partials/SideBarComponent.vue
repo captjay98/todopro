@@ -3,7 +3,6 @@ import { RouterLink, useRoute } from 'vue-router'
 import Button from '@/components/partials/ButtonComponent.vue'
 import { ref } from 'vue'
 
-
 const route = useRoute()
 const currentFilter = ref('all')
 const isSidebarVisible = ref(true)
@@ -11,7 +10,7 @@ const isSidebarVisible = ref(true)
 const { getTodos, todosData, currentPage } = defineProps({
     getTodos: Function,
     todosData: Object,
-    currentPage: Number,
+    currentPage: Number
 })
 
 const setFilterAndFetchTodos = (filter) => {
@@ -21,17 +20,17 @@ const setFilterAndFetchTodos = (filter) => {
 const toggleSidebar = () => {
     isSidebarVisible.value = !isSidebarVisible.value
 }
-
 </script>
 
 <template>
-    <div v-if="route.path === '/todos'" class="w-[3rem] text-slate-400 fixed top-10 left-32 lg:hidden top-2 left-5 z-100">
+    <div v-if="route.path === '/todos'"
+        class="fixed top-10 left-32 lg:hidden w-[3rem] text-slate-400 max-sm:top-2 max-sm:left-5 z-100">
         <Button @click="toggleSidebar">SB</Button>
     </div>
     <aside v-if="isSidebarVisible && route.path === '/todos'"
-        class=" fixed h-screen left-0 top-0 bg-blue-900/70 rounded-lg w-[8rem] xl:w-[10%]">
+        class="fixed h-screen left-0 top-0 bg-blue-900/70 rounded-lg w-[8rem] xl:w-[10%]">
         <div v-if="route.path === '/todos'"
-            class="w-[3rem] text-slate-400 fixed top-10 left-32 lg:hidden top-2 left-5 z-100">
+            class="fixed top-10 left-32 lg:hidden w-[3rem] text-slate-400 max-sm:top-2 max-sm:left-5 z-100">
             <Button @click="toggleSidebar">SB</Button>
         </div>
         <div class="flex flex-col gap-5 justify-center items-center pt-20 h-full text-slate-200 text-[0.9rem]">
@@ -41,15 +40,25 @@ const toggleSidebar = () => {
                 </RouterLink>
             </div>
             <p :class="{ 'bg-black/60 w-full text-white py-1 px-3 rounded': currentFilter === 'all' }"
-                @click="setFilterAndFetchTodos('all')">All</p>
+                @click="setFilterAndFetchTodos('all')">
+                All
+            </p>
             <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'true' }"
-                @click="setFilterAndFetchTodos('true')">Completed</p>
+                @click="setFilterAndFetchTodos('true')">
+                Completed
+            </p>
             <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'false' }"
-                @click="setFilterAndFetchTodos('false')">Not Completed</p>
+                @click="setFilterAndFetchTodos('false')">
+                Not Completed
+            </p>
             <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'newest' }"
-                @click="setFilterAndFetchTodos('newest')">Newest</p>
+                @click="setFilterAndFetchTodos('newest')">
+                Newest
+            </p>
             <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'oldest' }"
-                @click="setFilterAndFetchTodos('oldest')">Oldest</p>
+                @click="setFilterAndFetchTodos('oldest')">
+                Oldest
+            </p>
         </div>
     </aside>
 </template>

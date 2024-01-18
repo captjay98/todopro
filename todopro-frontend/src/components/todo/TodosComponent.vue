@@ -16,7 +16,7 @@ const { getTodos, filterTodos } = useTodoApi();
 const todosData = reactive({ todos: {}, currentPage: 0, totalPages: 1, totalItems: 1 })
 
 const handleTodoDeleted = async (deletedTodoId) => {
-    await getTodos(todosData)
+    await getTodos(todosData.currentPage, todosData)
 }
 
 const goToPreviousPage = async () => {
