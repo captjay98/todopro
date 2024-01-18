@@ -16,14 +16,14 @@ if (token) {
 }
 
 axiosInstance.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response?.status === 401 && error.config.url !== '/api/user') {
-        localStorage.removeItem('token');
-        router.push({ name: 'login' });
-      }
-      return Promise.reject(error);
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && error.config.url !== '/api/user') {
+      localStorage.removeItem('token')
+      router.push({ name: 'login' })
     }
-  );
+    return Promise.reject(error)
+  }
+)
 
 export default axiosInstance

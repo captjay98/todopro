@@ -8,57 +8,75 @@ const currentFilter = ref('all')
 const isSidebarVisible = ref(true)
 
 const { getTodos, todosData, currentPage } = defineProps({
-    getTodos: Function,
-    todosData: Object,
-    currentPage: Number
+  getTodos: Function,
+  todosData: Object,
+  currentPage: Number
 })
 
 const setFilterAndFetchTodos = (filter) => {
-    currentFilter.value = filter
-    getTodos(currentPage, todosData, filter)
+  currentFilter.value = filter
+  getTodos(currentPage, todosData, filter)
 }
 const toggleSidebar = () => {
-    isSidebarVisible.value = !isSidebarVisible.value
+  isSidebarVisible.value = !isSidebarVisible.value
 }
 </script>
 
 <template>
-    <div v-if="route.path === '/todos'"
-        class="fixed top-10 left-32 lg:hidden w-[3rem] text-slate-400 max-sm:top-2 max-sm:left-5 z-100">
-        <Button @click="toggleSidebar">SB</Button>
+  <div
+    v-if="route.path === '/todos'"
+    class="fixed top-10 left-32 lg:hidden w-[3rem] text-slate-400 max-sm:top-2 max-sm:left-5 z-100"
+  >
+    <Button @click="toggleSidebar">SB</Button>
+  </div>
+  <aside
+    v-if="isSidebarVisible && route.path === '/todos'"
+    class="fixed h-screen left-0 top-0 bg-blue-900/70 rounded-lg w-[8rem] xl:w-[10%]"
+  >
+    <div
+      v-if="route.path === '/todos'"
+      class="fixed top-10 left-32 lg:hidden w-[3rem] text-slate-400 max-sm:top-2 max-sm:left-5 z-100"
+    >
+      <Button @click="toggleSidebar">SB</Button>
     </div>
-    <aside v-if="isSidebarVisible && route.path === '/todos'"
-        class="fixed h-screen left-0 top-0 bg-blue-900/70 rounded-lg w-[8rem] xl:w-[10%]">
-        <div v-if="route.path === '/todos'"
-            class="fixed top-10 left-32 lg:hidden w-[3rem] text-slate-400 max-sm:top-2 max-sm:left-5 z-100">
-            <Button @click="toggleSidebar">SB</Button>
-        </div>
-        <div class="flex flex-col gap-5 justify-center items-center pt-20 h-full text-slate-200 text-[0.9rem]">
-            <div class="px-2">
-                <RouterLink to="/create-todo">
-                    <Button> Add Todo </Button>
-                </RouterLink>
-            </div>
-            <p :class="{ 'bg-black/60 w-full text-white py-1 px-3 rounded': currentFilter === 'all' }"
-                @click="setFilterAndFetchTodos('all')">
-                All
-            </p>
-            <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'true' }"
-                @click="setFilterAndFetchTodos('true')">
-                Completed
-            </p>
-            <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'false' }"
-                @click="setFilterAndFetchTodos('false')">
-                Not Completed
-            </p>
-            <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'newest' }"
-                @click="setFilterAndFetchTodos('newest')">
-                Newest
-            </p>
-            <p :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'oldest' }"
-                @click="setFilterAndFetchTodos('oldest')">
-                Oldest
-            </p>
-        </div>
-    </aside>
+    <div
+      class="flex flex-col gap-5 justify-center items-center pt-20 h-full text-slate-200 text-[0.9rem]"
+    >
+      <div class="px-2">
+        <RouterLink to="/create-todo">
+          <Button> Add Todo </Button>
+        </RouterLink>
+      </div>
+      <p
+        :class="{ 'bg-black/60 w-full text-white py-1 px-3 rounded': currentFilter === 'all' }"
+        @click="setFilterAndFetchTodos('all')"
+      >
+        All
+      </p>
+      <p
+        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'true' }"
+        @click="setFilterAndFetchTodos('true')"
+      >
+        Completed
+      </p>
+      <p
+        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'false' }"
+        @click="setFilterAndFetchTodos('false')"
+      >
+        Not Completed
+      </p>
+      <p
+        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'newest' }"
+        @click="setFilterAndFetchTodos('newest')"
+      >
+        Newest
+      </p>
+      <p
+        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'oldest' }"
+        @click="setFilterAndFetchTodos('oldest')"
+      >
+        Oldest
+      </p>
+    </div>
+  </aside>
 </template>
