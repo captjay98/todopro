@@ -19,7 +19,7 @@ class AuthenticatedSessionController extends Controller
             $request->authenticate();
             $request->session()->regenerate();
             $token = auth()->user()->createToken('client');
-            return response()->json(['token' => $token->plainTextToken]);
+            return response()->json(['token' => $token->plainTextToken, 'user' => auth()->user()]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
