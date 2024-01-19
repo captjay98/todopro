@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import TodosView from '../views/TodosView.vue'
-import TodoView from '../views/TodoView.vue'
-import ProfileView from '../views/ProfileView.vue'
-import CreateTodoView from '../views/CreateTodoView.vue'
+import HomeView from '@/views/HomeView.vue'
+import DashboardView from '@/views/DashboardView.vue'
+import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import TodosView from '@/views/TodosView.vue'
+import TodoView from '@/views/TodoView.vue'
+import ProfileView from '@/views/ProfileView.vue'
+import CreateTodoView from '@/views/CreateTodoView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -13,6 +14,12 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
+    },
+
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: DashboardView
     },
 
     {

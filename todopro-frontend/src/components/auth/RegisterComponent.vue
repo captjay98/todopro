@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axiosInstance from '@/middlewares/axiosInstance.js'
 import { useToast } from 'vue-toastification'
-
+import { useUserStore } from '@/stores/userStore.js'
 const router = useRouter()
 const toast = useToast()
 
@@ -16,6 +16,8 @@ const form = ref({
   password: '',
   password_confirmation: ''
 })
+
+const userStore = useUserStore()
 
 /**
  * Registers a new user by sending form data to the /register endpoint.
@@ -37,7 +39,10 @@ const register = async () => {
       `Bearer ${localStorage.getItem('token')}`
     toast.clear()
     toast.success('Welcome to TodoPro!')
-    router.push({ name: 'home' })
+
+    const user = response.data.user
+    userStore.setUser(user)
+    router.push('/dashboard')
   } catch (error) {
     toast.clear()
     if (error.response) {

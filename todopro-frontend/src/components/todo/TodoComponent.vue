@@ -18,8 +18,10 @@ const { deleteTodo, updateCompleted } = useTodoApi()
   >
     <div class="h-full w-[80%] m-auto">
       <RouterLink class="flex flex-col justify-center h-full" :to="`/todo/${todo.id}`">
-        <h3 class="font-bold text-[1rem]">{{ todo.title }}</h3>
-        <p class="font-normal truncate text-[0.78rem]">{{ todo.description }}</p>
+        <h3 data-test="title" class="font-bold text-[1rem]">{{ todo.title }}</h3>
+        <p data-test="description" class="font-normal truncate text-[0.78rem]">
+          {{ todo.description }}
+        </p>
       </RouterLink>
     </div>
 
@@ -30,7 +32,7 @@ const { deleteTodo, updateCompleted } = useTodoApi()
         class="w-7 h-7 text-indigo-600 rounded-md border-2 border-blue-500 transition duration-150 ease-in-out appearance-none checked:bg-blue-700 checked:border-0 bg-slate-600/90"
         :checked="todo.completed"
       />
-      <p class="cursor text-xl font-bold" @click="deleteTodo(todo, emit)">X</p>
+      <p class="text-xl font-bold cursor" @click="deleteTodo(todo, emit)">X</p>
     </div>
   </div>
 </template>

@@ -1,24 +1,23 @@
 <script setup>
 import WelcomeComponent from '@/components/WelcomeComponent.vue'
-import DashboardComponent from '@/components/DashboardComponent.vue'
-import { useUserStore } from '@/stores/userStore.js'
-import { reactive } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import router from '@/router'
+import { onMounted, onBeforeMount } from 'vue'
 
 const userStore = useUserStore()
 
-const userData = reactive({ user: {} })
-const getUser = async () => {
-  userData.user = (await userStore.user) ? userStore.user : userStore.setUser()
-}
+onBeforeMount(async () => {
+  const user = await userStore.setUser()
+  if (user) {
+    router.push('/dashboard')
+  } else {
+    return
+  }
+})
 </script>
 
 <template>
   <main class="w-full h-full">
-    <template v-if="getUser">
-      <DashboardComponent />
-    </template>
-    <template v-else>
-      <WelcomeComponent />
-    </template>
+    <WelcomeComponent />
   </main>
 </template>

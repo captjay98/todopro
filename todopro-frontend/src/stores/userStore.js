@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import axiosInstance from '@/middlewares/axiosInstance.js'
 
 import { useToast } from 'vue-toastification'
+import router from '@/router'
 
 const toast = useToast()
 
@@ -17,26 +18,33 @@ export const useUserStore = defineStore('user', {
   actions: {
     /**
      * Asynchronously sets the user by making a GET request to '/api/user'.
-     *
+     * @param {Object} user - The user object to set, passed after login or registration.
      * @return {Promise<Object>} The user object fetched from the API.
      * @throws {Error} If there is an error during the request.
      */
-    async setUser() {
-      try {
-        const response = await axiosInstance.get('/api/user')
-        this.user = response.data.data
-        return this.user
-      } catch (error) {
-        if (error.response.data) {
-          if (error.response.data.message) {
-            toast.error(error.response.data.message)
+    async setUser(user) {
+      if (user) {
+        this.user = user
+        router.push('/dashboard')
+      } else {
+        try {
+          const response = await axiosInstance.get('/api/user')
+          this.user = response.data.data
+          return this.user
+        } catch (error) {
+          if (error.response.data) {
+            if (router.currentRoute.value.path === '/') {
+              return
+            } else if (error.response.data.message) {
+              toast.error(error.response.data.message)
+            } else {
+              toast.error(`Coudn't Set User. ${error.response.statusText}`)
+            }
           } else {
-            toast.error(`Coudn't fetch Todos. ${error.response.statusText}`)
+            toast.error('There was a network error. Please try again later.')
           }
-        } else {
-          toast.error('There was a network error. Please try again later.')
+          this.user = null
         }
-        this.user = null
       }
     },
     /**
@@ -50,7 +58,7 @@ export const useUserStore = defineStore('user', {
         if (response.data.success === true) {
           localStorage.removeItem('token')
           this.user = null
-          location.reload()
+          router.go('/')
           toast.success('You have been Logged Out!')
         }
       } catch (error) {

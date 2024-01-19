@@ -35,8 +35,9 @@ const login = async () => {
     axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(
       'token'
     )}`
-    userStore.setUser()
-    router.push({ name: 'home' })
+    const user = response.data.user
+    userStore.setUser(user)
+    router.push('/dashboard')
   } catch (error) {
     if (error.response) {
       console.log(error.response)
