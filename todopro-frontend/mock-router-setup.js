@@ -7,10 +7,12 @@ import {
   import { beforeEach, afterEach, vi } from 'vitest';
 
 
-const router = createRouterMock({spy: {
+export const router = createRouterMock({spy: {
     create: fn => vi.fn(fn),
     reset: spy => spy.mockReset(),
     },})
+
+  config.plugins.VueWrapper.install(VueRouterMock)
 
   beforeEach(() => {
     injectRouterMock(router);
@@ -19,7 +21,3 @@ const router = createRouterMock({spy: {
   afterEach(() => {
     router.reset();
   });
-
-  config.plugins.VueWrapper.install(VueRouterMock)
-
-  export { router }
