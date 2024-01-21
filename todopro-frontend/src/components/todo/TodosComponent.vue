@@ -18,14 +18,14 @@ const handleTodoDeleted = async (deletedTodoId) => {
 
 const goToPreviousPage = async () => {
   if (todosData.currentPage > 1) {
-    getTodos(todosData.currentPage - 1, todosData)
+    await getTodos(todosData.currentPage - 1, todosData)
     todosData.currentPage--
   }
 }
 
 const goToNextPage = async () => {
   if (todosData.currentPage < todosData.totalPages) {
-    getTodos(todosData.currentPage + 1, todosData)
+    await getTodos(todosData.currentPage + 1, todosData)
     todosData.currentPage++
   }
 }
@@ -46,6 +46,7 @@ const todosArray = computed(() => Object.values(todosData.todos))
   <div class="w-full">
     <div v-if="route.path !== '/dashboard'" class="flex justify-center items-center space-x-2 my-4">
       <button
+        aria-label="Previous Page"
         @click="goToPreviousPage"
         :disabled="todosData.currentPage <= 1"
         class="p-1 px-3 border rounded text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -54,6 +55,7 @@ const todosArray = computed(() => Object.values(todosData.todos))
       </button>
       <span class="text-white">Page {{ todosData.currentPage }} of {{ todosData.totalPages }}</span>
       <button
+        aria-label="Next Page"
         @click="goToNextPage"
         :disabled="todosData.currentPage >= todosData.totalPages"
         class="p-1 px-3 border rounded text-sm bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"

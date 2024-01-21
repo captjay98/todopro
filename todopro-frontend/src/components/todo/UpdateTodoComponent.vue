@@ -34,6 +34,7 @@ onMounted(async () => {
 <template>
   <div class="w-full">
     <form
+      data-test="form"
       @submit.prevent="updateTodo(form, id)"
       class="flex flex-col gap-4 pb-5 m-auto text-slate-200"
     >
@@ -41,6 +42,7 @@ onMounted(async () => {
       <div class="flex flex-col">
         <label for="title" class="px-1 text-left text-[1.0rem]">Title:</label>
         <input
+          data-test="title"
           type="text"
           v-model="form.title"
           id="title"
@@ -51,6 +53,7 @@ onMounted(async () => {
       <div class="flex flex-col">
         <label for="description" class="px-1 text-left text-[1.0rem]">Description:</label>
         <textarea
+          data-test="description"
           v-model="form.description"
           id="description"
           rows="5"
@@ -62,6 +65,7 @@ onMounted(async () => {
         <div class="flex">
           <label for="completed" class="px-1 my-1 text-left text-[1.0rem]">Completed:</label>
           <input
+            data-test="completed"
             type="checkbox"
             v-model="form.completed"
             id="completed"
@@ -69,13 +73,15 @@ onMounted(async () => {
           />
         </div>
         <div class="flex items-center pr-3">
-          <p class="text-xl font-bold" @click="deleteTodo(todoData.todo, emit)">X</p>
+          <p data-test="delete" class="text-xl font-bold" @click="deleteTodo(todoData.todo, emit)">
+            X
+          </p>
         </div>
       </div>
       <div class="w-full">
-        <Button type="submit" class="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600"
-          >Update Todo</Button
-        >
+        <Button type="submit" class="py-2 px-4 text-white bg-blue-500 rounded hover:bg-blue-600">
+          Update Todo
+        </Button>
       </div>
     </form>
   </div>
