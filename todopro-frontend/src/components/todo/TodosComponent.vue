@@ -18,14 +18,14 @@ const handleTodoDeleted = async (deletedTodoId) => {
 
 const goToPreviousPage = async () => {
   if (todosData.currentPage > 1) {
-    await getTodos(todosData.currentPage - 1, todosData)
+    getTodos(todosData.currentPage - 1, todosData)
     todosData.currentPage--
   }
 }
 
 const goToNextPage = async () => {
   if (todosData.currentPage < todosData.totalPages) {
-    await getTodos(todosData.currentPage + 1, todosData)
+    getTodos(todosData.currentPage + 1, todosData)
     todosData.currentPage++
   }
 }
