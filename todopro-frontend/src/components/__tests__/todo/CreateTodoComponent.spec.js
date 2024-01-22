@@ -1,40 +1,22 @@
-import { mount, flushPromises } from '@vue/test-utils'
-import { test, describe, it, expect, beforeEach, vi } from 'vitest'
-import UpdateTodoComponent from '@/components/todo/UpdateTodoComponent.vue'
-import { router } from '../../../mock-router-setup.js'
+import { mount } from '@vue/test-utils'
+import { test, describe, expect, beforeEach, vi } from 'vitest'
+import CreateTodoComponent from '@/components/todo/CreateTodoComponent.vue'
 
-const getTodoMock = vi.fn()
-const deleteTodoMock = vi.fn()
-const updateTodoMock = vi.fn()
-const mockRoute = {
-  params: {
-    id: 1
-  }
-}
+const createTodoMock = vi.fn()
 
 vi.mock('@/composables/todoApi.js', () => ({
   useTodoApi: () => ({
-    getTodo: getTodoMock,
-    deleteTodo: deleteTodoMock,
-    updateTodo: updateTodoMock
+    createTodo: createTodoMock
   })
 }))
 
 let wrapper
 
 beforeEach(() => {
-  wrapper = mount(UpdateTodoComponent, {
-    global: {
-      mocks: {
-        $route: mockRoute
-      }
-    }
-  })
+  wrapper = mount(CreateTodoComponent)
 })
 
-describe('UpdateTodoComponent', () => {
-  test('calls getTodo on Mount', () => expect(getTodoMock).toHaveBeenCalled)
-
+describe('CreateTodoComponent', () => {
   describe('form and inputs can be rendered', () => {
     describe('renders a form', () => {
       test('has a form', async () => {
@@ -59,41 +41,7 @@ describe('UpdateTodoComponent', () => {
         const checkbox = wrapper.find('input[type="checkbox"]')
         expect(checkbox.element.checked).toBe(false)
       })
-      test('displays the todo delete todo Icon(X)', () => {
-        const deleteIcon = wrapper.find('[data-test="description"]')
-        expect(deleteIcon.exists()).toBe(true)
-      })
     })
-
-    // test('pre-fills form with todo data', async () => {
-    //   const todo = {
-    //     id: 1,
-    //     title: 'Test todo',
-    //     description: 'Todo description',
-    //     completed: 'false'
-    //   }
-
-    //   await getTodoMock.mockResolvedValue(todo)
-
-    //   wrapper = await mount(UpdateTodoComponent, {
-    //     global: {
-    //       mocks: {
-    //         $route: mockRoute
-    //       }
-    //     }
-    //   })
-    //   await flushPromises()
-    //   await wrapper.vm.$nextTick()
-
-    //   const titleInput = wrapper.find('[data-test="title"]')
-    //   expect(titleInput.element.value).toBe('Test todo')
-
-    //   const descriptionInput = wrapper.find('[data-test="description"]')
-    //   expect(descriptionInput.element.value).toBe('Todo description')
-
-    //   const completedInput = wrapper.find('input[type="checkbox"]')
-    //   expect(completedInput.element.checked).toBe(false)
-    // })
 
     describe('form inputs can be filled', () => {
       test('title can be filled', async () => {
@@ -118,45 +66,26 @@ describe('UpdateTodoComponent', () => {
     describe('form can be interacted with', () => {
       test('form can be submitted', async () => {
         await wrapper.find('[data-test="form"]').trigger('submit')
-        expect(updateTodoMock).toHaveBeenCalled()
+        expect(createTodoMock).toHaveBeenCalled()
       })
 
       test('createTodoMock called with form values', async () => {
         const titleInput = wrapper.find('[data-test="title"]')
         const descriptionInput = wrapper.find('[data-test="description"]')
         const completedInput = wrapper.find('input[type="checkbox"]')
-        const deleteIcon = wrapper.find('[data-test="description"]')
 
         await titleInput.setValue('New Todo')
         await descriptionInput.setValue('New Todo Description')
         await completedInput.trigger('click')
-        await deleteIcon.trigger('click')
         await wrapper.find('[data-test="form"]').trigger('submit')
 
-        expect(updateTodoMock).toHaveBeenCalled()
+        expect(createTodoMock).toHaveBeenCalled({})
 
         // expect(createTodoMock).toHaveBeenCalledWith({
         //   title: 'New Todo',
         //   description: 'New Todo Description',
         //   completed: true
         // }, expect.any(Function))
-      })
-
-      test('todo Status can be updated', async () => {
-        await wrapper.find('[data-test="form"]').trigger('submit')
-        expect(updateTodoMock).toHaveBeenCalled()
-      })
-
-      test('completed status can be updated', async () => {
-        const completedInput = wrapper.find('input[type="checkbox"]')
-        await completedInput.trigger('click')
-        expect(completedInput.element.checked).toBe(true)
-      })
-
-      test('todo can be deleted', async () => {
-        const deleteIcon = wrapper.find('[data-test="delete"]')
-        await deleteIcon.trigger('click')
-        expect(deleteTodoMock).toHaveBeenCalled()
       })
     })
   })

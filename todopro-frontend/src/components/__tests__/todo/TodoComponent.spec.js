@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { test, describe, it, expect, beforeEach, vi } from 'vitest'
+import { test, describe, expect, beforeEach, vi } from 'vitest'
 import TodoComponent from '@/components/todo/TodoComponent.vue'
-import { router } from '../../../mock-router-setup.js'
 
 const RouterLinkStub = {
   template: '<a><slot></slot></a>',
