@@ -9,6 +9,5 @@ beforeEach(() => {
 })
 
 describe('Dashboard view', () => {
-test('boilerplate')
-
+  test('boilerplate')
 })

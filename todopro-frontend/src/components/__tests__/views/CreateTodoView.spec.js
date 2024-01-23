@@ -10,7 +10,5 @@ beforeEach(() => {
 })
 
 describe('CreateTodo view', () => {
-
-
-test('boilerplate')
+  test('boilerplate')
 })

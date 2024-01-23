@@ -10,5 +10,5 @@ beforeEach(() => {
 })
 
 describe('Profile view', () => {
-test('boilerplate')
+  test('boilerplate')
 })

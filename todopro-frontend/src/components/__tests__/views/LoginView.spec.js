@@ -10,7 +10,5 @@ beforeEach(() => {
 })
 
 describe('Login view', () => {
-test('boilerplate')
-
-
+  test('boilerplate')
 })

@@ -9,6 +9,5 @@ beforeEach(() => {
 })
 
 describe('welcome component', () => {
-test('boilerplate')
-
+  test('boilerplate')
 })

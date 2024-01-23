@@ -10,6 +10,5 @@ beforeEach(() => {
 })
 
 describe('Register view', () => {
-
-test('boilerplate')
+  test('boilerplate')
 })

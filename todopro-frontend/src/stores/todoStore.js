@@ -11,7 +11,7 @@ export const useTodoStore = defineStore('items', () => {
     currentPage: 1,
     totalPages: 1,
     currentFilter: 'all',
-    cache:{}
+    cache: {}
   })
 
   const getTodos = async (page) => {
@@ -46,7 +46,6 @@ export const useTodoStore = defineStore('items', () => {
     todos.cache = {}
   }
 
-
   const getTodo = async (id) => {
     try {
       const todo = todos.items.find((todo) => todo.id == id)
@@ -55,7 +54,6 @@ export const useTodoStore = defineStore('items', () => {
       handleErrors(error)
     }
   }
-
 
   const createTodo = async (form, emit) => {
     toast.info('Creating Todo...', { timeout: 2000 })
@@ -72,7 +70,6 @@ export const useTodoStore = defineStore('items', () => {
     }
   }
 
-
   const updateTodo = async (form) => {
     console.log
     toast.info('Updating Todo...', { timeout: 2000 })
@@ -87,15 +84,14 @@ export const useTodoStore = defineStore('items', () => {
     }
   }
 
-
   const deleteTodo = async (todo, emit) => {
     try {
       toast.info('Deleting Todo', { timeout: 2000 })
       await axiosInstance.delete(`/api/todos/${todo.id}`)
       clearCache()
       emit('todoDeleted', todo.id)
-      if (router.currentRoute.value.path !== '/dashboard'){
-      router.push('/todos')
+      if (router.currentRoute.value.path !== '/dashboard') {
+        router.push('/todos')
       }
       getTodos(todos.currentPage)
       toast.clear()
@@ -104,7 +100,6 @@ export const useTodoStore = defineStore('items', () => {
       handleErrors(error)
     }
   }
-
 
   const updateCompleted = async (todo, completed) => {
     let update = !completed
@@ -118,13 +113,11 @@ export const useTodoStore = defineStore('items', () => {
     }
   }
 
-
   const setFilter = (filter) => {
     todos.currentFilter = filter
     getTodos(1)
     // todos.currentPage = 1
   }
-
 
   const handleErrors = (error) => {
     if (error.response) {
@@ -149,6 +142,6 @@ export const useTodoStore = defineStore('items', () => {
     updateTodo,
     deleteTodo,
     updateCompleted,
-    setFilter,
+    setFilter
   }
 })

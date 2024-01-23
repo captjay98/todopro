@@ -8,6 +8,8 @@ beforeEach(() => {
   wrapper = mount(PasswordComponent)
 })
 
-describe('Login view', () => {
-test('boilerplate')
+describe('password component', () => {
+  test('password component can mount', () => {
+    expect(wrapper.findComponent(PasswordComponent).exists()).toBe(true)
+  })
 })

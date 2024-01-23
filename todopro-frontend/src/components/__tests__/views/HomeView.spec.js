@@ -9,7 +9,5 @@ beforeEach(() => {
 })
 
 describe('Home view', () => {
-
-test('boilerplate')
-
+  test('boilerplate')
 })
