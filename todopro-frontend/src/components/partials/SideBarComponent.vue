@@ -1,24 +1,12 @@
 <script setup>
-import { RouterLink, useRoute } from 'vue-router'
 import Button from '@/components/partials/ButtonComponent.vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { ref } from 'vue'
+import { useTodoStore } from '@/stores/todoStore.js'
 
+const todoStore = useTodoStore()
 const route = useRoute()
-const currentFilter = ref('all')
 const isSidebarVisible = ref(true)
-
-/**
- * Retrieves todos from the server.
- *
- * @param {Function} getTodos - The function to retrieve todos.
- * @param {Object} todosData - The data object for todos.
- * @param {Number} currentPage - The current page number.
- */
-const { getTodos, todosData, currentPage } = defineProps({
-  getTodos: Function,
-  todosData: Object,
-  currentPage: Number
-})
 
 /**
  * Sets the filter value and fetches todos based on the given filter.
@@ -27,8 +15,7 @@ const { getTodos, todosData, currentPage } = defineProps({
  * @return {void} No return value.
  */
 const setFilterAndFetchTodos = (filter) => {
-  currentFilter.value = filter
-  getTodos(currentPage, todosData, filter)
+  todoStore.setFilter(filter)
 }
 
 //Toggles the sidebar on smaller devices
@@ -63,31 +50,41 @@ const toggleSidebar = () => {
         </RouterLink>
       </div>
       <p
-        :class="{ 'bg-black/60 w-full text-white py-1 px-3 rounded': currentFilter === 'all' }"
+        :class="{
+          'bg-black/60 w-full text-white py-1 px-3 rounded': todoStore.todos.currentFilter === 'all'
+        }"
         @click="setFilterAndFetchTodos('all')"
       >
         All
       </p>
       <p
-        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'true' }"
+        :class="{
+          'bg-black w-full text-white py-1 px-3 rounded': todoStore.todos.currentFilter === 'true'
+        }"
         @click="setFilterAndFetchTodos('true')"
       >
         Completed
       </p>
       <p
-        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'false' }"
+        :class="{
+          'bg-black w-full text-white py-1 px-3 rounded': todoStore.todos.currentFilter === 'false'
+        }"
         @click="setFilterAndFetchTodos('false')"
       >
         Not Completed
       </p>
       <p
-        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'newest' }"
+        :class="{
+          'bg-black w-full text-white py-1 px-3 rounded': todoStore.todos.currentFilter === 'newest'
+        }"
         @click="setFilterAndFetchTodos('newest')"
       >
         Newest
       </p>
       <p
-        :class="{ 'bg-black w-full text-white py-1 px-3 rounded': currentFilter === 'oldest' }"
+        :class="{
+          'bg-black w-full text-white py-1 px-3 rounded': todoStore.todos.currentFilter === 'oldest'
+        }"
         @click="setFilterAndFetchTodos('oldest')"
       >
         Oldest

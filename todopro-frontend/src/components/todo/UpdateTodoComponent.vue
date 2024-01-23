@@ -2,17 +2,15 @@
 import Button from '@/components/partials/ButtonComponent.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useTodoApi } from '@/composables/todoApi.js'
+import { useTodoStore } from '@/stores/todoStore'
 import { useToast } from 'vue-toastification'
 
-const { getTodo, deleteTodo, updateTodo } = useTodoApi()
+const todoStore = useTodoStore()
 const toast = useToast()
 const route = useRoute()
 const id = route.params.id
 
 const emit = defineEmits(['todoDeleted'])
-
-const todoData = reactive({ todo: {} })
 
 const form = ref({
   id: '',
@@ -23,19 +21,26 @@ const form = ref({
 
 onMounted(async () => {
   try {
-    await getTodo(form, id)
-    todoData.todo = form.value
+    const todo = await todoStore.getTodo(id)
+    form.value = todo
   } catch (error) {
     toast.error('Failed to Fetch Todo on Mount')
   }
 })
+
+const deleteTodo = async () => {
+  todoStore.deleteTodo(form.value, emit)
+}
+const updateTodo = async () => {
+  todoStore.updateTodo(form.value)
+}
 </script>
 
 <template>
   <div class="w-full">
     <form
       data-test="form"
-      @submit.prevent="updateTodo(form, id)"
+      @submit.prevent="updateTodo"
       class="flex flex-col gap-4 pb-5 m-auto text-slate-200"
     >
       <h1 class="text-2xl font-semibold text-center text-slate-200">Edit Todo</h1>
@@ -73,9 +78,7 @@ onMounted(async () => {
           />
         </div>
         <div class="flex items-center pr-3">
-          <p data-test="delete" class="text-xl font-bold" @click="deleteTodo(todoData.todo, emit)">
-            X
-          </p>
+          <p data-test="delete" class="text-xl font-bold" @click="deleteTodo()">X</p>
         </div>
       </div>
       <div class="w-full">

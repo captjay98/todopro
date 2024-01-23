@@ -1,9 +1,10 @@
 <script setup>
 import Button from '@/components/partials/ButtonComponent.vue'
 import { ref } from 'vue'
-import { useTodoApi } from '@/composables/todoApi.js'
+import { useTodoStore } from '@/stores/todoStore'
+import router from '@/router'
 
-const { createTodo } = useTodoApi()
+const todoStore = useTodoStore()
 const emit = defineEmits(['todoCreated'])
 
 const form = ref({
@@ -11,12 +12,21 @@ const form = ref({
   description: '',
   completed: false
 })
+
+const createTodo = async () => {
+  await todoStore.createTodo(form.value, emit)
+  if (router.currentRoute.value.path === '/dashboard') {
+    todoStore.getTodos(1, todoStore.todos)
+  } else {
+    router.push('/todos')
+  }
+}
 </script>
 <template>
   <div class="w-full">
     <form
       data-test="form"
-      @submit.prevent="createTodo(form, emit)"
+      @submit.prevent="createTodo"
       class="flex flex-col gap-4 pb-5 m-auto text-slate-200"
     >
       <h1 class="text-2xl font-semibold text-center text-slate-200">Add Todo</h1>
@@ -39,6 +49,7 @@ const form = ref({
           v-model="form.description"
           id="description"
           rows="5"
+          required
           class="overflow-y-auto p-2 tracking-wide leading-4 rounded-lg focus:border-blue-700 focus:ring-0 focus:outline-none active:bg-blue-500 text-[0.8rem] bg-slate-600/90 min-h-[6rem] max-h-[20.0rem] focus:border-[0.2rem]"
         ></textarea>
       </div>
