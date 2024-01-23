@@ -1,7 +1,8 @@
 import axiosInstance from '@/middlewares/axiosInstance.js'
-import { reactive, computed } from 'vue'
+import { reactive } from 'vue'
 import { useToast } from 'vue-toastification'
 import { defineStore } from 'pinia'
+import router from '@/router'
 
 export const useTodoStore = defineStore('items', () => {
   const toast = useToast()
@@ -9,21 +10,42 @@ export const useTodoStore = defineStore('items', () => {
     items: [],
     currentPage: 1,
     totalPages: 1,
-    currentFilter: 'all'
+    currentFilter: 'all',
+    cache:{}
   })
 
   const getTodos = async (page) => {
+    const cacheKey = `page_${page}-filter${todos.currentFilter}`
+    if (todos.cache[cacheKey]) {
+      todos.items = todos.cache[cacheKey].items
+      todos.currentPage = todos.cache[cacheKey].currentPage
+      todos.totalPages = todos.cache[cacheKey].totalPages
+      toast.success('Todos loaded from cache', { timeout: 1000 })
+      return
+    }
     toast.info('Fetching Todos...', { timeout: 2000 })
     try {
       const params = { page }
+      params.filter = todos.currentFilter
       const response = await axiosInstance.get('/api/todos', { params })
       todos.items = response.data.data
       todos.currentPage = response.data.meta.current_page
       todos.totalPages = response.data.meta.last_page
+
+      todos.cache[cacheKey] = {
+        items: response.data.data,
+        currentPage: response.data.meta.current_page,
+        totalPages: response.data.meta.last_page
+      }
     } catch (error) {
       handleErrors(error)
     }
   }
+
+  const clearCache = () => {
+    todos.cache = {}
+  }
+
 
   const getTodo = async (id) => {
     try {
@@ -34,6 +56,7 @@ export const useTodoStore = defineStore('items', () => {
     }
   }
 
+
   const createTodo = async (form, emit) => {
     toast.info('Creating Todo...', { timeout: 2000 })
     try {
@@ -41,12 +64,14 @@ export const useTodoStore = defineStore('items', () => {
       const todo = response.data
       todos.items.push(todo)
       toast.clear()
+      clearCache()
       emit('todoCreated', todo.id)
       toast.success('Todo Created')
     } catch (error) {
       handleErrors(error)
     }
   }
+
 
   const updateTodo = async (form) => {
     console.log
@@ -62,11 +87,16 @@ export const useTodoStore = defineStore('items', () => {
     }
   }
 
+
   const deleteTodo = async (todo, emit) => {
     try {
       toast.info('Deleting Todo', { timeout: 2000 })
       await axiosInstance.delete(`/api/todos/${todo.id}`)
+      clearCache()
       emit('todoDeleted', todo.id)
+      if (router.currentRoute.value.path !== '/dashboard'){
+      router.push('/todos')
+      }
       getTodos(todos.currentPage)
       toast.clear()
       toast.success('Todo Deleted', { timeout: 2000 })
@@ -74,6 +104,7 @@ export const useTodoStore = defineStore('items', () => {
       handleErrors(error)
     }
   }
+
 
   const updateCompleted = async (todo, completed) => {
     let update = !completed
@@ -87,26 +118,13 @@ export const useTodoStore = defineStore('items', () => {
     }
   }
 
+
   const setFilter = (filter) => {
     todos.currentFilter = filter
+    getTodos(1)
+    // todos.currentPage = 1
   }
 
-  const filteredTodos = computed(() => {
-    switch (todos.currentFilter) {
-      case 'all':
-        return todos.items
-      case 'true':
-        return todos.items.filter((todo) => todo.completed)
-      case 'false':
-        return todos.items.filter((todo) => !todo.completed)
-      case 'newest':
-        return [...todos.items].sort((a, b) => a.createdAt - b.createdAt)
-      case 'oldest':
-        return [...todos.items].sort((a, b) => b.createdAt - a.createdAt)
-      default:
-        return todos.items
-    }
-  })
 
   const handleErrors = (error) => {
     if (error.response) {
@@ -125,12 +143,12 @@ export const useTodoStore = defineStore('items', () => {
   return {
     todos,
     getTodos,
+    clearCache,
     getTodo,
     createTodo,
     updateTodo,
     deleteTodo,
     updateCompleted,
     setFilter,
-    filteredTodos
   }
 })
