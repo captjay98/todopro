@@ -4,8 +4,8 @@ import CreateTodoComponent from '@/components/todo/CreateTodoComponent.vue'
 
 const createTodoMock = vi.fn()
 
-vi.mock('@/composables/todoApi.js', () => ({
-  useTodoApi: () => ({
+vi.mock('@/stores/todoStore.js', () => ({
+  useTodoStore: () => ({
     createTodo: createTodoMock
   })
 }))

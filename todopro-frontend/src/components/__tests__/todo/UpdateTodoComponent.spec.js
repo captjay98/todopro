@@ -11,9 +11,8 @@ const mockRoute = {
   }
 }
 
-vi.mock('@/composables/todoApi.js', () => ({
-  useTodoApi: () => ({
-    getTodo: getTodoMock,
+vi.mock('@/stores/todoStore.js', () => ({
+  useTodoStore: () => ({
     deleteTodo: deleteTodoMock,
     updateTodo: updateTodoMock
   })
@@ -32,7 +31,7 @@ beforeEach(() => {
 })
 
 describe('UpdateTodoComponent', () => {
-  test('calls getTodo on Mount', () => expect(getTodoMock).toHaveBeenCalled)
+  //   test('calls getTodo on Mount', () => expect(getTodoMock).toHaveBeenCalled)
 
   describe('form and inputs can be rendered', () => {
     describe('renders a form', () => {

@@ -10,8 +10,8 @@ const RouterLinkStub = {
 const deleteTodoMock = vi.fn()
 const updateCompletedMock = vi.fn()
 
-vi.mock('@/composables/todoApi.js', () => ({
-  useTodoApi: () => ({
+vi.mock('@/stores/todoStore.js', () => ({
+  useTodoStore: () => ({
     deleteTodo: deleteTodoMock,
     updateCompleted: updateCompletedMock
   })
@@ -23,7 +23,7 @@ beforeEach(() => {
   const todo = { id: 1, title: 'test todo', description: 'testing todo', completed: false }
   wrapper = mount(TodoComponent, {
     global: {
-      //   plugins: [router],
+      // plugins: [router],
       stubs: {
         RouterLink: RouterLinkStub
       }
