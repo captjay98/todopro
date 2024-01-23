@@ -1,15 +1,10 @@
 <script setup>
 import Button from '@/components/partials/ButtonComponent.vue'
-import { useRouter } from 'vue-router'
 import { ref } from 'vue'
-import axiosInstance from '@/middlewares/axiosInstance.js'
-import { useToast } from 'vue-toastification'
-import { useUserStore } from '@/stores/userStore.js'
-const router = useRouter()
-const toast = useToast()
+import { useUserStore } from '@/stores/userStore'
 
+const userStore = useUserStore()
 const loading = ref(false)
-const message = ref('{}')
 const form = ref({
   name: '',
   email: '',
@@ -17,53 +12,9 @@ const form = ref({
   password_confirmation: ''
 })
 
-const userStore = useUserStore()
-
-/**
- * Registers a new user by sending form data to the /register endpoint.
- * It handles the success and error cases by showing appropriate toast messages.
- * On successful registration, it stores the token, sets the authorization header,
- * and navigates to the 'home' route.
- */
+// Asynchronously registers a user using the provided form, loading, and toast.
 const register = async () => {
-  message.value = {}
-  loading.value = true
-  toast('Signing you up...', { timeout: false })
-
-  try {
-    // Obtain CSRF token
-    await axiosInstance.get('sanctum/csrf-cookie')
-    const response = await axiosInstance.post('register', form.value)
-    localStorage.setItem('token', response.data.token)
-    axiosInstance.defaults.headers.common['Authorization'] =
-      `Bearer ${localStorage.getItem('token')}`
-    toast.clear()
-    toast.success('Welcome to TodoPro!')
-
-    const user = response.data.user
-    userStore.setUser(user)
-    router.push('/dashboard')
-  } catch (error) {
-    toast.clear()
-    if (error.response) {
-      if (error.response.status === 422) {
-        // Validation errors
-        for (const fieldErrors of Object.values(error.response.data.errors)) {
-          fieldErrors.forEach((errorMessage) => {
-            toast.error(errorMessage)
-          })
-        }
-      } else if (error.response.data && error.response.data.message) {
-        toast.error(error.response.data.message)
-      }
-    } else {
-      toast.error('There was a network error. Please try again later.')
-    }
-  } finally {
-    loading.value = false
-    form.value.password = ''
-    form.value.password_confirmation = ''
-  }
+  await userStore.registerUser(form, loading)
 }
 </script>
 <template>
@@ -72,10 +23,11 @@ const register = async () => {
       <h1 class="pb-10 text-2xl font-semibold tracking-wider text-center text-slate-300">
         CREATE ACCOUNT
       </h1>
-      <form @submit.prevent="register" class="flex flex-col gap-4">
+      <form data-test="form" @submit.prevent="register" class="flex flex-col gap-4">
         <div class="flex flex-col">
           <label class="px-1 text-left text-[1.0rem]" for="name">Name</label>
           <input
+            data-test="name"
             type="text"
             id="name"
             v-model="form.name"
@@ -86,6 +38,7 @@ const register = async () => {
         <div class="flex flex-col">
           <label class="px-1 text-left text-[1.0rem]" for="email">Email</label>
           <input
+            data-test="email"
             type="email"
             id="email"
             v-model="form.email"
@@ -97,6 +50,7 @@ const register = async () => {
         <div class="flex flex-col">
           <label class="px-1 text-left text-[1.0rem]" for="password">Password</label>
           <input
+            data-test="password"
             type="password"
             id="password"
             v-model="form.password"
@@ -109,6 +63,7 @@ const register = async () => {
             >Confirm Password</label
           >
           <input
+            data-test="password_confirmation"
             type="password"
             id="password_confirmation"
             v-model="form.password_confirmation"

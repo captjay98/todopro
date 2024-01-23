@@ -21,6 +21,7 @@ class Todo extends JsonResource
             'description' => $this->description,
             'completed' => $this->completed,
             'user_id' => $this->user_id,
+            'created_at' => $this->created_at,
         ];
     }
 }

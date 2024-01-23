@@ -1,15 +1,24 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import { computed } from 'vue'
-import { useTodoApi } from '@/composables/todoApi.js'
-
+// import { useTodoApi } from '@/composables/todoApi.js'
+import { useTodoStore } from '@/stores/todoStore'
 const { todo } = defineProps({
   todo: Object
 })
 
+const todoStore = useTodoStore()
 const completed = computed(() => todo.completed)
 const emit = defineEmits(['todoDeleted'])
-const { deleteTodo, updateCompleted } = useTodoApi()
+
+const deleteTodo = async () => {
+  todoStore.deleteTodo(todo, emit)
+  //   todoStore.getTodos(1)
+}
+
+const updateCompleted = async () => {
+  todoStore.updateCompleted(todo, completed)
+}
 </script>
 
 <template>
@@ -29,11 +38,11 @@ const { deleteTodo, updateCompleted } = useTodoApi()
       <input
         data-test="completed"
         type="checkbox"
-        @click="updateCompleted(todo, completed)"
+        @click="updateCompleted"
         class="w-7 h-7 text-indigo-600 rounded-md border-2 border-blue-500 transition duration-150 ease-in-out appearance-none checked:bg-blue-700 checked:border-0 bg-slate-600/90"
         :checked="todo.completed"
       />
-      <p data-test="delete" class="text-xl font-bold cursor" @click="deleteTodo(todo, emit)">X</p>
+      <p data-test="delete" class="text-xl font-bold cursor" @click="deleteTodo">X</p>
     </div>
   </div>
 </template>

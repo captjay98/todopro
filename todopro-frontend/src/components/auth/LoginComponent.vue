@@ -1,69 +1,29 @@
 <script setup>
 import Button from '@/components/partials/ButtonComponent.vue'
-import axiosInstance from '@/middlewares/axiosInstance.js'
-import { useToast } from 'vue-toastification'
-import { useUserStore } from '@/stores/userStore'
-import { useRouter } from 'vue-router'
 import { ref } from 'vue'
+import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
-const router = useRouter()
-const toast = useToast()
 const loading = ref(false)
-
-const message = ref('')
 const form = ref({
   email: '',
   password: ''
 })
 
-/**
- * Attempts to log in a user using the provided email and password.
- * It obtains a CSRF token, sends the login credentials to /login endpoint,
- * and then handles success and error responses. On success, it stores the token,
- * sets the authorization header, updates user state, and redirects to the 'home' route.
- *  On error, it shows a relevant error message using toast notifications.
- */
+// Logs a user in using provided form data.
 const login = async () => {
-  message.value = ''
-  loading.value = true
-  try {
-    await axiosInstance.get('/sanctum/csrf-cookie')
-    const response = await axiosInstance.post('login', form.value)
-    const token = response.data.token ? response.data.token : null
-    localStorage.setItem('token', token)
-    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem(
-      'token'
-    )}`
-    const user = response.data.user
-    userStore.setUser(user)
-    router.push('/dashboard')
-  } catch (error) {
-    if (error.response) {
-      console.log(error.response)
-      toast.clear()
-      if (error.response.status === 422) {
-        toast.error(error.response.data.message)
-      } else if (error.response.data && error.response.data.error) {
-        toast.error(error.response.data.error)
-      }
-    } else {
-      toast.error('There was a network error. Please try again later.')
-    }
-  } finally {
-    loading.value = false
-  }
-  form.value.password = ''
+  await userStore.loginUser(form, loading)
 }
 </script>
 <template>
   <div class="flex justify-end w-full h-full text-2xl tracking-normal text-center text-slate-200">
     <div class="m-auto w-[20rem] h-[30rem]">
       <h1 class="pb-10 text-2xl font-semibold tracking-wider text-center text-slate-300">LOGIN</h1>
-      <form @submit.prevent="login" class="flex flex-col gap-4">
+      <form data-test="form" @submit.prevent="login" class="flex flex-col gap-4">
         <div class="flex flex-col">
           <label class="px-1 text-left text-[1.0rem]" for="email">Email</label>
           <input
+            data-test="email"
             type="email"
             id="email"
             v-model="form.email"
@@ -75,6 +35,7 @@ const login = async () => {
         <div class="flex flex-col">
           <label class="px-1 text-left text-[1.0rem]" for="password">Password</label>
           <input
+            data-test="password"
             type="password"
             id="password"
             v-model="form.password"

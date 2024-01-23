@@ -37,7 +37,7 @@ class TodoController extends Controller
                 'false' => $query->where('completed', false),
                 'newest' => $query->orderBy('created_at', 'desc'),
                 'oldest' => $query->orderBy('created_at', 'asc'),
-                'all' => null,
+                'all' => $query->orderBy('updated_at', 'desc'),
             };
         }
 
@@ -58,10 +58,10 @@ class TodoController extends Controller
 
         $todo = Todo::create(
             [
-            'user_id' => $userId,
-            'title' => $request->title,
-            'description' => $request->description,
-            'completed' => $request->completed
+                'user_id' => $userId,
+                'title' => $request->title,
+                'description' => $request->description,
+                'completed' => $request->completed
             ]
         );
 
