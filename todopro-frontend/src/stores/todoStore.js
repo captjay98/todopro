@@ -16,30 +16,52 @@ export const useTodoStore = defineStore('items', () => {
 
   const getTodos = async (page) => {
     const cacheKey = `page_${page}-filter${todos.currentFilter}`
-    if (todos.cache[cacheKey]) {
-      todos.items = todos.cache[cacheKey].items
-      todos.currentPage = todos.cache[cacheKey].currentPage
-      todos.totalPages = todos.cache[cacheKey].totalPages
-      toast.success('Todos loaded from cache', { timeout: 1000 })
+
+    if (loadTodosFromCache(cacheKey)) {
       return
     }
+
     toast.info('Fetching Todos...', { timeout: 2000 })
     try {
       const params = { page }
       params.filter = todos.currentFilter
       const response = await axiosInstance.get('/api/todos', { params })
+      const data = {
+        items: response.data.data,
+        currentPage: response.data.meta.current_page,
+        totalPages: response.data.meta.last_page,
+        currentFilter: todos.currentFilter
+      }
+      cacheTodos(cacheKey, data)
+
       todos.items = response.data.data
       todos.currentPage = response.data.meta.current_page
       todos.totalPages = response.data.meta.last_page
-
-      todos.cache[cacheKey] = {
-        items: response.data.data,
-        currentPage: response.data.meta.current_page,
-        totalPages: response.data.meta.last_page
-      }
     } catch (error) {
       handleErrors(error)
     }
+  }
+
+  const cacheTodos = (cacheKey, data) => {
+    todos.cache[cacheKey] = {
+      items: data.items,
+      currentPage: data.currentPage,
+      totalPages: data.totalPages
+    }
+  }
+
+  const getFromCache = (cacheKey) => todos.cache[cacheKey]
+
+  const loadTodosFromCache = (cacheKey) => {
+    const cachedData = getFromCache(cacheKey)
+    if (cachedData) {
+      todos.items = todos.cache[cacheKey].items
+      todos.currentPage = todos.cache[cacheKey].currentPage
+      todos.totalPages = todos.cache[cacheKey].totalPages
+      toast.success('Todos loaded from cache', { timeout: 1000 })
+      return true
+    }
+    return false
   }
 
   const clearCache = () => {
@@ -78,6 +100,7 @@ export const useTodoStore = defineStore('items', () => {
       const index = todos.items.findIndex((todo) => todo.id == form.id)
       todos.items[index] = response.data
       toast.clear()
+      clearCache()
       toast.success('Your todo has been updated!')
     } catch (error) {
       handleErrors(error)
@@ -116,7 +139,6 @@ export const useTodoStore = defineStore('items', () => {
   const setFilter = (filter) => {
     todos.currentFilter = filter
     getTodos(1)
-    // todos.currentPage = 1
   }
 
   const handleErrors = (error) => {
