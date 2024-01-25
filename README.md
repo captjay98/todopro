@@ -6,54 +6,58 @@ I recommend using a local DB.
 
 ## Clone the repository
 
-git clone https://github.com/captjay98/todopro
+        git clone https://github.com/captjay98/todopro
 
 ## CD into the directory
 
-cd todopro
+        cd todopro
 
 ## Copy the example environment file
 
-cp exampleenv .env
+        cp exampleenv .env
 
 THE DB IS REALLY SLOW, If you can edit the env file and use a db that's available locally, It'll be much better.
 
 ## Install Backend dependencies
 
-composer install
+        composer install
 
 ## Clear config Cache and Cache
 
-php artisan cache:clear
-php artisan config:clear
-php artisan config:cache
+        php artisan cache:clear
+        php artisan config:clear
+        php artisan config:cache
 
 ## Run database migrations
 
-php artisan migrate
+        php artisan migrate
 
 ## Seed the database
 
-php artisan db:seed
+        php artisan db:seed
 
 ## Install frontend dependencies
 
-yarn install or npm install
+        yarn install or npm install
 
 ## Start the Frontend Dev server in the background
 
 Better to run it in the foreground and run the backend in another tab
 
-npm run dev &
+        npm run dev &
 
 ## Go back to the project root directory
 
-cd ..
+        cd ..
 
 ## Start the Backend Dev server
 
-php artisan serve &
+        php artisan serve &
 
 ## RUN BACKEND TESTS
 
-php artisan test
+        php artisan test
+        
+## RUN FRONTEND TESTS
+
+        npm run test
