@@ -21,9 +21,9 @@ DB_USERNAME=todopro
 DB_PASSWORD=jtz1uGdFEo3Y
 
 # DB_HOST=127.0.0.1
-# DB_DATABASE=ticketer
-# DB_USERNAME=ticketer
-# DB_PASSWORD=ticketer
+# DB_DATABASE=todopro
+# DB_USERNAME=todopro
+# DB_PASSWORD=todopro
 
 BROADCAST_DRIVER=log
 CACHE_DRIVER=file
